@@ -2,20 +2,34 @@ import React, { useState, useCallback } from "react";
 import { useEffect } from "react";
 import Square from "./Square";
 
+const generateRandomColor = () => {
+  const posibilities = "0123456789abcdef";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += posibilities[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
 function App() {
   const [color, setColor] = useState("#0055ff");
-  const [dimentions, setDimensions] = useState(20);
+  const [colors, setColors] = useState<string[]>([]);
+  const [dimentions, setDimensions] = useState(16);
   const [mouseIsDown, setMouseIsDown] = useState(false);
   const [border, setBorder] = useState(true);
-  const generateGrid = useCallback(() => {
-    const arr = [];
-    for (let i = 0; i < dimentions ** 2; i++) arr.push("#ffffff");
-    return arr;
-  }, [dimentions]);
+  const generateGrid = useCallback(
+    (random?: boolean) => {
+      const arr = [];
+      for (let i = 0; i < dimentions ** 2; i++)
+        arr.push(random ? generateRandomColor() : "#ffffff");
+      return arr;
+    },
+    [dimentions]
+  );
   const [grid, setGrid] = useState(generateGrid);
 
   useEffect(() => {
-    setGrid(generateGrid);
+    setGrid(generateGrid());
   }, [dimentions, generateGrid]);
 
   useEffect(() => {
@@ -64,20 +78,43 @@ function App() {
         <input
           type="color"
           value={color}
-          onChange={(e) => setColor(e.target.value)}
+          onChange={(e) => {
+            setColor(e.target.value);
+          }}
+          onBlur={(e) => {
+            setColors((colorList) => {
+              colorList.push(e.target.value);
+              return [...colorList];
+            });
+          }}
         />
+        {colors.map((color, idx) => (
+          <div
+            key={idx}
+            style={{ backgroundColor: color, width: "20px", height: "20px" }}
+            onClick={() => setColor(color)}
+          />
+        ))}
         <input
           type="range"
           min="1"
-          max="50"
+          max="80"
           value={dimentions}
           onChange={(e) => setDimensions(Number(e.target.value))}
         />
+        <h5>
+          {dimentions} x {dimentions}
+        </h5>
+        {dimentions > 40 && <h5>More than 40 x 40 pixels can be slow!</h5>}
         <input
           type="checkbox"
           checked={border}
           onChange={(e) => setBorder(e.target.checked)}
         />
+        <button onClick={() => setGrid(generateGrid())}>Clear</button>
+        <button onClick={() => setGrid(generateGrid(true))}>
+          Random Colors
+        </button>
       </div>
     </div>
   );
