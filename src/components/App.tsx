@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useEffect } from "react";
 import Square from "./Square";
+import Color from "./Color";
 
 const generateRandomColor = () => {
   const posibilities = "0123456789abcdef";
@@ -13,15 +14,15 @@ const generateRandomColor = () => {
 
 function App() {
   const [color, setColor] = useState("#0055ff");
-  const [colors, setColors] = useState<string[]>([]);
+  const [colors, setColors] = useState(new Set<string>());
   const [dimentions, setDimensions] = useState(16);
   const [mouseIsDown, setMouseIsDown] = useState(false);
   const [border, setBorder] = useState(true);
   const generateGrid = useCallback(
-    (random?: boolean) => {
+    (random?: boolean, color?: string) => {
       const arr = [];
       for (let i = 0; i < dimentions ** 2; i++)
-        arr.push(random ? generateRandomColor() : "#ffffff");
+        arr.push(random ? generateRandomColor() : color ? color : "#ffffff");
       return arr;
     },
     [dimentions]
@@ -83,16 +84,22 @@ function App() {
           }}
           onBlur={(e) => {
             setColors((colorList) => {
-              colorList.push(e.target.value);
-              return [...colorList];
+              colorList.add(e.target.value);
+              return new Set(colorList);
             });
           }}
         />
-        {colors.map((color, idx) => (
-          <div
-            key={idx}
-            style={{ backgroundColor: color, width: "20px", height: "20px" }}
-            onClick={() => setColor(color)}
+        {Array.from(colors).map((color) => (
+          <Color
+            key={color}
+            color={color}
+            onRemove={(color) =>
+              setColors((colors) => {
+                colors.delete(color);
+                return new Set(colors);
+              })
+            }
+            onClick={(color) => setColor(color)}
           />
         ))}
         <input
