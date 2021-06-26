@@ -122,6 +122,9 @@ function App() {
         <button onClick={() => setGrid(generateGrid(true))}>
           Random Colors
         </button>
+        <button onClick={() => setGrid(generateGrid(false, color))}>
+          Fill color
+        </button>
       </div>
     </div>
   );
