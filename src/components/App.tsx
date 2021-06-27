@@ -37,27 +37,27 @@ function App() {
     },
     [dimentions]
   );
-  const [grid, setGrid] = useState(generateGrid(true));
-  const gridRef = useRef<HTMLDivElement>(null);
+  const [grid, setGrid] = useState(generateGrid);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    setGrid(generateGrid(true));
+    setGrid(generateGrid());
   }, [dimentions, generateGrid]);
 
   useEffect(() => {
-    const gridDiv = gridRef.current;
-    gridDiv?.addEventListener("mousedown", (e) => {
+    const canvas = canvasRef.current;
+    canvas?.addEventListener("mousedown", (e) => {
       e.preventDefault();
+      console.log("mouse down");
       setMouseIsDown(true);
     });
-    gridDiv?.addEventListener("mouseup", () => setMouseIsDown(false));
+    canvas?.addEventListener("mouseup", () => setMouseIsDown(false));
     return () => {
-      gridDiv?.removeEventListener("mousedown", (e) => {
+      canvas?.removeEventListener("mousedown", (e) => {
         e.preventDefault();
         setMouseIsDown(true);
       });
-      gridDiv?.removeEventListener("mouseup", () => setMouseIsDown(false));
+      canvas?.removeEventListener("mouseup", () => setMouseIsDown(false));
     };
   });
 
@@ -93,7 +93,33 @@ function App() {
         height={dimentions}
         width={dimentions}
         style={{
+          border: "1px solid black",
           minWidth: "200px",
+        }}
+        onClick={({ clientX, clientY, currentTarget }) => {
+          setGrid((grid) => {
+            const squareLength = currentTarget.width / dimentions;
+            const row = Math.floor(clientY / squareLength);
+            const col = Math.floor(clientX / squareLength);
+            console.log("row:", row, "col:", col);
+            const idx = row * dimentions + col;
+            grid[idx] = color;
+            return [...grid];
+          });
+        }}
+        onMouseMove={({ clientX, clientY, currentTarget }) => {
+          console.log(mouseIsDown);
+          if (mouseIsDown) {
+            setGrid((grid) => {
+              const squareLength = currentTarget.width / dimentions;
+              const row = Math.floor(clientY / squareLength);
+              const col = Math.floor(clientX / squareLength);
+              console.log("row:", row, "col:", col);
+              const idx = row * dimentions + col;
+              grid[idx] = color;
+              return [...grid];
+            });
+          }
         }}
       />
       <div>
