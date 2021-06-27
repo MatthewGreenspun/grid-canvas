@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import Square from "./Square";
 import Color from "./Color";
 
 const generateRandomColor = () => {
@@ -17,20 +16,33 @@ function App() {
   const [dimentions, setDimensions] = useState(16);
   const [mouseIsDown, setMouseIsDown] = useState(false);
   const [border, setBorder] = useState(true);
+  const scaleCanvas = useCallback((canvas: HTMLCanvasElement) => {
+    let dpi = window.devicePixelRatio;
+    let style_height = +getComputedStyle(canvas)
+      .getPropertyValue("height")
+      .slice(0, -2);
+    let style_width = +getComputedStyle(canvas)
+      .getPropertyValue("width")
+      .slice(0, -2);
+    canvas.setAttribute("height", `${style_height * dpi}`);
+    canvas.setAttribute("width", `${style_width * dpi}`);
+  }, []);
   const generateGrid = useCallback(
     (random?: boolean, color?: string) => {
       const arr = [];
-      for (let i = 0; i < dimentions ** 2; i++)
+      for (let i = 0; i < dimentions ** 2; i++) {
         arr.push(random ? generateRandomColor() : color ? color : "#ffffff");
+      }
       return arr;
     },
     [dimentions]
   );
-  const [grid, setGrid] = useState(generateGrid);
+  const [grid, setGrid] = useState(generateGrid(true));
   const gridRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    setGrid(generateGrid());
+    setGrid(generateGrid(true));
   }, [dimentions, generateGrid]);
 
   useEffect(() => {
@@ -49,32 +61,41 @@ function App() {
     };
   });
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (ctx && canvas) {
+      scaleCanvas(canvas);
+
+      const squareLength = canvas.width / dimentions;
+      const rows = dimentions;
+      const cols = dimentions;
+      let row = 0;
+      let col = 0;
+      for (row = 0; row < rows; row++) {
+        for (col = 0; col < cols; col++) {
+          ctx.fillStyle = grid[rows * row + col];
+          ctx.fillRect(
+            col * squareLength,
+            row * squareLength,
+            squareLength,
+            squareLength
+          );
+        }
+      }
+    }
+  }, [dimentions, scaleCanvas, grid]);
+
   return (
     <div className="app">
-      <div
-        ref={gridRef}
-        className="grid"
+      <canvas
+        ref={canvasRef}
+        height={dimentions}
+        width={dimentions}
         style={{
-          gridTemplateColumns: `repeat(${dimentions}, 1fr)`,
-          gridTemplateRows: `repeat(${dimentions}, 1fr)`,
+          minWidth: "200px",
         }}
-      >
-        {grid.map((row, idx) => (
-          <Square
-            color={grid[idx]}
-            key={idx}
-            id={idx}
-            border={border}
-            mouseIsDown={mouseIsDown}
-            onColor={(id) =>
-              setGrid((grid) => {
-                grid[id] = color;
-                return [...grid];
-              })
-            }
-          />
-        ))}
-      </div>
+      />
       <div>
         <input
           type="color"
@@ -105,14 +126,13 @@ function App() {
         <input
           type="range"
           min="1"
-          max="80"
+          max="100"
           value={dimentions}
           onChange={(e) => setDimensions(Number(e.target.value))}
         />
         <h5>
           {dimentions} x {dimentions}
         </h5>
-        {dimentions > 40 && <h5>More than 40 x 40 pixels can be slow!</h5>}
         <input
           type="checkbox"
           checked={border}
