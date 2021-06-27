@@ -42,13 +42,14 @@ function App() {
 
   useEffect(() => {
     setGrid(generateGrid());
-  }, [dimentions, generateGrid]);
+    if (dimentions > 40) setBorder(false);
+    else setBorder(true);
+  }, [dimentions, generateGrid, scaleCanvas]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     canvas?.addEventListener("mousedown", (e) => {
       e.preventDefault();
-      console.log("mouse down");
       setMouseIsDown(true);
     });
     canvas?.addEventListener("mouseup", () => setMouseIsDown(false));
@@ -64,27 +65,35 @@ function App() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
+    console.log(border);
     if (ctx && canvas) {
       scaleCanvas(canvas);
 
-      const squareLength = canvas.width / dimentions;
+      const squareLength = Math.round(canvas.width / dimentions);
       const rows = dimentions;
       const cols = dimentions;
       let row = 0;
       let col = 0;
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 3;
       for (row = 0; row < rows; row++) {
         for (col = 0; col < cols; col++) {
+          const squareX = col * squareLength;
+          const squareY = row * squareLength;
+          if (border) {
+            ctx.beginPath();
+            ctx.moveTo(squareX, squareY);
+            ctx.lineTo(squareX + squareLength, squareY);
+            ctx.moveTo(squareX, squareY);
+            ctx.lineTo(squareX, squareY + squareLength);
+            ctx.stroke();
+          }
           ctx.fillStyle = grid[rows * row + col];
-          ctx.fillRect(
-            col * squareLength,
-            row * squareLength,
-            squareLength,
-            squareLength
-          );
+          ctx.fillRect(squareX, squareY, squareLength, squareLength);
         }
       }
     }
-  }, [dimentions, scaleCanvas, grid]);
+  }, [dimentions, scaleCanvas, grid, border]);
 
   return (
     <div className="app">
@@ -101,20 +110,17 @@ function App() {
             const squareLength = currentTarget.width / dimentions;
             const row = Math.floor(clientY / squareLength);
             const col = Math.floor(clientX / squareLength);
-            console.log("row:", row, "col:", col);
             const idx = row * dimentions + col;
             grid[idx] = color;
             return [...grid];
           });
         }}
         onMouseMove={({ clientX, clientY, currentTarget }) => {
-          console.log(mouseIsDown);
           if (mouseIsDown) {
             setGrid((grid) => {
               const squareLength = currentTarget.width / dimentions;
               const row = Math.floor(clientY / squareLength);
               const col = Math.floor(clientX / squareLength);
-              console.log("row:", row, "col:", col);
               const idx = row * dimentions + col;
               grid[idx] = color;
               return [...grid];
