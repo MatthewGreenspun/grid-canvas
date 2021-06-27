@@ -1,5 +1,4 @@
-import React, { useState, useCallback } from "react";
-import { useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Square from "./Square";
 import Color from "./Color";
 
@@ -28,32 +27,33 @@ function App() {
     [dimentions]
   );
   const [grid, setGrid] = useState(generateGrid);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setGrid(generateGrid());
   }, [dimentions, generateGrid]);
 
   useEffect(() => {
-    const gridDiv = document.getElementById("grid-div") as HTMLDivElement;
-    gridDiv.addEventListener("mousedown", (e) => {
+    const gridDiv = gridRef.current;
+    gridDiv?.addEventListener("mousedown", (e) => {
       e.preventDefault();
       setMouseIsDown(true);
     });
-    gridDiv.addEventListener("mouseup", () => setMouseIsDown(false));
+    gridDiv?.addEventListener("mouseup", () => setMouseIsDown(false));
     return () => {
-      gridDiv.removeEventListener("mousedown", (e) => {
+      gridDiv?.removeEventListener("mousedown", (e) => {
         e.preventDefault();
         setMouseIsDown(true);
       });
-      gridDiv.removeEventListener("mouseup", () => setMouseIsDown(false));
+      gridDiv?.removeEventListener("mouseup", () => setMouseIsDown(false));
     };
   });
 
   return (
     <div className="app">
       <div
+        ref={gridRef}
         className="grid"
-        id="grid-div"
         style={{
           gridTemplateColumns: `repeat(${dimentions}, 1fr)`,
           gridTemplateRows: `repeat(${dimentions}, 1fr)`,
