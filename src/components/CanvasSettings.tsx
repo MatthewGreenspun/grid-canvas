@@ -1,4 +1,9 @@
 import React from "react";
+import Box from "@material-ui/core/Box";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Slider from "@material-ui/core/Slider";
+import Button from "@material-ui/core/Button";
 import Color from "./Color";
 
 interface Props {
@@ -30,7 +35,7 @@ const CanvasSettings: React.FC<Props> = ({
   generateGrid,
 }) => {
   return (
-    <div>
+    <Box>
       <input
         type="color"
         value={color}
@@ -57,27 +62,47 @@ const CanvasSettings: React.FC<Props> = ({
           onClick={(color) => setColor(color)}
         />
       ))}
-      <input
-        type="range"
-        min="1"
-        max="100"
+      <Slider
+        min={1}
+        max={100}
         value={dimensions}
-        onChange={(e) => setDimensions(Number(e.target.value))}
+        onChange={(e, newVal) => setDimensions(newVal as number)}
       />
       <h5>
         {dimensions} x {dimensions}
       </h5>
-      <input
-        type="checkbox"
-        checked={border}
-        onChange={(e) => setBorder(e.target.checked)}
+      <FormControlLabel
+        control={
+          <Checkbox
+            color="primary"
+            checked={border}
+            onChange={(e) => setBorder(e.target.checked)}
+          />
+        }
+        label="Show Grid"
       />
-      <button onClick={() => setGrid(generateGrid())}>Clear</button>
-      <button onClick={() => setGrid(generateGrid(true))}>Random Colors</button>
-      <button onClick={() => setGrid(generateGrid(false, color))}>
+      <Button
+        color="primary"
+        variant="contained"
+        onClick={() => setGrid(generateGrid())}
+      >
+        Clear
+      </Button>
+      <Button
+        color="primary"
+        variant="contained"
+        onClick={() => setGrid(generateGrid(true))}
+      >
+        Random Colors
+      </Button>
+      <Button
+        color="primary"
+        variant="contained"
+        onClick={() => setGrid(generateGrid(false, color))}
+      >
         Fill color
-      </button>
-    </div>
+      </Button>
+    </Box>
   );
 };
 

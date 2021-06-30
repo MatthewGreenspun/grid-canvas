@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import Box from "@material-ui/core/Box";
 import CanvasSettings from "./CanvasSettings";
 
 const generateRandomColor = () => {
@@ -42,8 +43,6 @@ function Canvas() {
 
   useEffect(() => {
     setGrid(generateGrid());
-    if (dimensions > 40) setBorder(false);
-    else setBorder(true);
   }, [dimensions, generateGrid, scaleCanvas]);
 
   useEffect(() => {
@@ -65,7 +64,6 @@ function Canvas() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    console.log(border);
     if (ctx && canvas) {
       scaleCanvas(canvas);
 
@@ -96,14 +94,21 @@ function Canvas() {
   }, [dimensions, scaleCanvas, grid, border]);
 
   return (
-    <div className="app">
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="flex-start"
+      justifyContent="center"
+    >
       <canvas
         ref={canvasRef}
         height={dimensions}
         width={dimensions}
         style={{
-          border: "1px solid black",
-          minWidth: "200px",
+          minWidth: "300px",
+          maxWidth: "vw",
+          maxHeight: "vh",
+          aspectRatio: "1 / 1",
         }}
         onClick={({ clientX, clientY, currentTarget }) => {
           setGrid((grid) => {
@@ -128,56 +133,6 @@ function Canvas() {
           }
         }}
       />
-      {/* <div>
-        <input
-          type="color"
-          value={color}
-          onChange={(e) => {
-            setColor(e.target.value);
-          }}
-          onBlur={(e) => {
-            setColors((colorList) => {
-              colorList.add(e.target.value);
-              return new Set(colorList);
-            });
-          }}
-        />
-        {Array.from(colors).map((color) => (
-          <Color
-            key={color}
-            color={color}
-            onRemove={(color) =>
-              setColors((colors) => {
-                colors.delete(color);
-                return new Set(colors);
-              })
-            }
-            onClick={(color) => setColor(color)}
-          />
-        ))}
-        <input
-          type="range"
-          min="1"
-          max="100"
-          value={dimentions}
-          onChange={(e) => setDimensions(Number(e.target.value))}
-        />
-        <h5>
-          {dimentions} x {dimentions}
-        </h5>
-        <input
-          type="checkbox"
-          checked={border}
-          onChange={(e) => setBorder(e.target.checked)}
-        />
-        <button onClick={() => setGrid(generateGrid())}>Clear</button>
-        <button onClick={() => setGrid(generateGrid(true))}>
-          Random Colors
-        </button>
-        <button onClick={() => setGrid(generateGrid(false, color))}>
-          Fill color
-        </button>
-      </div> */}
       <CanvasSettings
         {...{
           dimensions,
@@ -192,7 +147,7 @@ function Canvas() {
           generateGrid,
         }}
       />
-    </div>
+    </Box>
   );
 }
 
