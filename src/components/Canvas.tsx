@@ -21,7 +21,7 @@ const generateRandomColor = () => {
 function Canvas() {
   const [color, setColor] = useState("#0055ff");
   const [colors, setColors] = useState(
-    new Set([color, "#ffffff", "#ff3300", "#ffff00", "#49d100"])
+    new Set(["#ffffff", "#000000", color, "#ff3300", "#ffff00", "#49d100"])
   );
   const [dimensions, setDimensions] = useState(16);
   const [mouseIsDown, setMouseIsDown] = useState(false);
@@ -112,45 +112,53 @@ function Canvas() {
       justifyContent="center"
     >
       <Box display="flex" flexDirection="column" alignItems="flex-start">
-        <canvas
-          ref={canvasRef}
-          height={dimensions}
-          width={dimensions}
-          style={{
-            minWidth: "700px",
-            maxWidth: "vw",
-            maxHeight: "vh",
-            aspectRatio: "1 / 1",
-          }}
-          onClick={({ clientX, clientY, currentTarget }) => {
-            setGrid((grid) => {
-              const squareLength = currentTarget.width / dimensions;
-              const row = Math.floor(
-                (clientY - currentTarget.getBoundingClientRect().y) /
-                  squareLength
-              );
-              const col = Math.floor(
-                (clientX - currentTarget.getBoundingClientRect().x) /
-                  squareLength
-              );
-              const idx = row * dimensions + col;
-              grid[idx] = color;
-              return [...grid];
-            });
-          }}
-          onMouseMove={({ clientX, clientY, currentTarget }) => {
-            if (mouseIsDown) {
+        <Box border="1px solid black" m={2}>
+          <canvas
+            ref={canvasRef}
+            height={dimensions}
+            width={dimensions}
+            style={{
+              minWidth: "700px",
+              maxWidth: "vw",
+              maxHeight: "vh",
+              aspectRatio: "1 / 1",
+            }}
+            onClick={({ clientX, clientY, currentTarget }) => {
               setGrid((grid) => {
                 const squareLength = currentTarget.width / dimensions;
-                const row = Math.floor(clientY / squareLength);
-                const col = Math.floor(clientX / squareLength);
+                const row = Math.floor(
+                  (clientY - currentTarget.getBoundingClientRect().y) /
+                    squareLength
+                );
+                const col = Math.floor(
+                  (clientX - currentTarget.getBoundingClientRect().x) /
+                    squareLength
+                );
                 const idx = row * dimensions + col;
                 grid[idx] = color;
                 return [...grid];
               });
-            }
-          }}
-        />
+            }}
+            onMouseMove={({ clientX, clientY, currentTarget }) => {
+              if (mouseIsDown) {
+                setGrid((grid) => {
+                  const squareLength = currentTarget.width / dimensions;
+                  const row = Math.floor(
+                    (clientY - currentTarget.getBoundingClientRect().y) /
+                      squareLength
+                  );
+                  const col = Math.floor(
+                    (clientX - currentTarget.getBoundingClientRect().x) /
+                      squareLength
+                  );
+                  const idx = row * dimensions + col;
+                  grid[idx] = color;
+                  return [...grid];
+                });
+              }
+            }}
+          />
+        </Box>
         <Fab
           onClick={() => setIsDownloading(true)}
           color="secondary"
