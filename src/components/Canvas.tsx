@@ -125,8 +125,14 @@ function Canvas() {
           onClick={({ clientX, clientY, currentTarget }) => {
             setGrid((grid) => {
               const squareLength = currentTarget.width / dimensions;
-              const row = Math.floor(clientY / squareLength);
-              const col = Math.floor(clientX / squareLength);
+              const row = Math.floor(
+                (clientY - currentTarget.getBoundingClientRect().y) /
+                  squareLength
+              );
+              const col = Math.floor(
+                (clientX - currentTarget.getBoundingClientRect().x) /
+                  squareLength
+              );
               const idx = row * dimensions + col;
               grid[idx] = color;
               return [...grid];
