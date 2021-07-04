@@ -1,10 +1,13 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "@material-ui/core/Link";
+import GetAppIcon from "@material-ui/icons/GetApp";
+import Fab from "@material-ui/core/Fab";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import Box from "@material-ui/core/Box";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 import CanvasSettings from "./CanvasSettings";
 
 const generateRandomColor = () => {
@@ -15,6 +18,12 @@ const generateRandomColor = () => {
   }
   return color;
 };
+
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    canvasContainer: {},
+  })
+);
 
 function Canvas() {
   const [color, setColor] = useState("#0055ff");
@@ -103,32 +112,22 @@ function Canvas() {
   return (
     <Box
       display="flex"
-      flexDirection="column"
+      flexWrap="wrap"
       alignItems="flex-start"
       justifyContent="center"
     >
-      <canvas
-        ref={canvasRef}
-        height={dimensions}
-        width={dimensions}
-        style={{
-          minWidth: "300px",
-          maxWidth: "vw",
-          maxHeight: "vh",
-          aspectRatio: "1 / 1",
-        }}
-        onClick={({ clientX, clientY, currentTarget }) => {
-          setGrid((grid) => {
-            const squareLength = currentTarget.width / dimensions;
-            const row = Math.floor(clientY / squareLength);
-            const col = Math.floor(clientX / squareLength);
-            const idx = row * dimensions + col;
-            grid[idx] = color;
-            return [...grid];
-          });
-        }}
-        onMouseMove={({ clientX, clientY, currentTarget }) => {
-          if (mouseIsDown) {
+      <Box display="flex" flexDirection="column" alignItems="flex-start">
+        <canvas
+          ref={canvasRef}
+          height={dimensions}
+          width={dimensions}
+          style={{
+            minWidth: "700px",
+            maxWidth: "vw",
+            maxHeight: "vh",
+            aspectRatio: "1 / 1",
+          }}
+          onClick={({ clientX, clientY, currentTarget }) => {
             setGrid((grid) => {
               const squareLength = currentTarget.width / dimensions;
               const row = Math.floor(clientY / squareLength);
@@ -137,9 +136,29 @@ function Canvas() {
               grid[idx] = color;
               return [...grid];
             });
-          }
-        }}
-      />
+          }}
+          onMouseMove={({ clientX, clientY, currentTarget }) => {
+            if (mouseIsDown) {
+              setGrid((grid) => {
+                const squareLength = currentTarget.width / dimensions;
+                const row = Math.floor(clientY / squareLength);
+                const col = Math.floor(clientX / squareLength);
+                const idx = row * dimensions + col;
+                grid[idx] = color;
+                return [...grid];
+              });
+            }
+          }}
+        />
+        <Fab
+          onClick={() => setIsDownloading(true)}
+          color="secondary"
+          variant="extended"
+        >
+          <GetAppIcon />
+          Download
+        </Fab>
+      </Box>
       <CanvasSettings
         {...{
           dimensions,
@@ -154,31 +173,30 @@ function Canvas() {
           generateGrid,
         }}
       />
-      <Button
-        onClick={() => setIsDownloading(true)}
-        color="secondary"
-        variant="contained"
-      >
-        Download
-      </Button>
-      <Dialog open={isDownloading} onClose={() => setIsDownloading(false)}>
-        <DialogTitle>Preview Image</DialogTitle>
-        <DialogContent>
-          <img src={canvasRef.current?.toDataURL("image/png")} alt="drawing" />
-        </DialogContent>
-        <DialogContent>
-          <Button color="secondary" variant="contained">
-            <Link
-              underline="none"
-              href={canvasRef.current?.toDataURL("img/png")}
-              download
-              onClick={() => setIsDownloading(false)}
-            >
-              Download
-            </Link>
-          </Button>
-        </DialogContent>
-      </Dialog>
+      {isDownloading && (
+        <Dialog open={isDownloading} onClose={() => setIsDownloading(false)}>
+          <DialogTitle>Preview Image</DialogTitle>
+          <DialogContent>
+            <img
+              style={{ maxWidth: "500px" }}
+              src={canvasRef.current?.toDataURL("image/png")}
+              alt="drawing"
+            />
+          </DialogContent>
+          <DialogContent>
+            <Button color="secondary" variant="contained">
+              <Link
+                underline="none"
+                href={canvasRef.current?.toDataURL("img/png")}
+                download
+                onClick={() => setIsDownloading(false)}
+              >
+                Download
+              </Link>
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
     </Box>
   );
 }
