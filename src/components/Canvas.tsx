@@ -7,7 +7,6 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import Box from "@material-ui/core/Box";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
 import CanvasSettings from "./CanvasSettings";
 
 const generateRandomColor = () => {
@@ -19,15 +18,11 @@ const generateRandomColor = () => {
   return color;
 };
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    canvasContainer: {},
-  })
-);
-
 function Canvas() {
   const [color, setColor] = useState("#0055ff");
-  const [colors, setColors] = useState(new Set<string>());
+  const [colors, setColors] = useState(
+    new Set([color, "#ffffff", "#ff3300", "#ffff00", "#49d100"])
+  );
   const [dimensions, setDimensions] = useState(16);
   const [mouseIsDown, setMouseIsDown] = useState(false);
   const [border, setBorder] = useState(true);
@@ -35,14 +30,14 @@ function Canvas() {
 
   const scaleCanvas = useCallback((canvas: HTMLCanvasElement) => {
     let dpi = window.devicePixelRatio;
-    let style_height = +getComputedStyle(canvas)
+    let styleHeight = +getComputedStyle(canvas)
       .getPropertyValue("height")
       .slice(0, -2);
-    let style_width = +getComputedStyle(canvas)
+    let styleWidth = +getComputedStyle(canvas)
       .getPropertyValue("width")
       .slice(0, -2);
-    canvas.setAttribute("height", `${style_height * dpi}`);
-    canvas.setAttribute("width", `${style_width * dpi}`);
+    canvas.setAttribute("height", `${styleHeight * dpi}`);
+    canvas.setAttribute("width", `${styleWidth * dpi}`);
   }, []);
   const generateGrid = useCallback(
     (random?: boolean, color?: string) => {

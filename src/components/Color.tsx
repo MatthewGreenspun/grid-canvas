@@ -11,6 +11,7 @@ interface Props {
 const Color: React.FC<Props> = ({ color, onRemove, onClick }) => {
   return (
     <Box
+      m={0.25}
       display="flex"
       borderColor="black"
       border="1px solid black"
