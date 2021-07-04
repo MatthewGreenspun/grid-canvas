@@ -1,4 +1,9 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import Link from "@material-ui/core/Link";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
 import Box from "@material-ui/core/Box";
 import CanvasSettings from "./CanvasSettings";
 
@@ -17,6 +22,8 @@ function Canvas() {
   const [dimensions, setDimensions] = useState(16);
   const [mouseIsDown, setMouseIsDown] = useState(false);
   const [border, setBorder] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const scaleCanvas = useCallback((canvas: HTMLCanvasElement) => {
     let dpi = window.devicePixelRatio;
     let style_height = +getComputedStyle(canvas)
@@ -147,6 +154,31 @@ function Canvas() {
           generateGrid,
         }}
       />
+      <Button
+        onClick={() => setIsDownloading(true)}
+        color="secondary"
+        variant="contained"
+      >
+        Download
+      </Button>
+      <Dialog open={isDownloading} onClose={() => setIsDownloading(false)}>
+        <DialogTitle>Preview Image</DialogTitle>
+        <DialogContent>
+          <img src={canvasRef.current?.toDataURL("image/png")} alt="drawing" />
+        </DialogContent>
+        <DialogContent>
+          <Button color="secondary" variant="contained">
+            <Link
+              underline="none"
+              href={canvasRef.current?.toDataURL("img/png")}
+              download
+              onClick={() => setIsDownloading(false)}
+            >
+              Download
+            </Link>
+          </Button>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }
