@@ -1,4 +1,3 @@
-# Grid Canvas     
+# Grid Canvas
 
-A web app for people to make and share drawings that are drawn on a grid.
-
+A website for drawing pictures on a grid. View it [here](https://gridcanvas.netlify.app/)
