@@ -162,6 +162,7 @@ function Canvas() {
                 });
               }
             }}
+            onMouseOut={() => setMouseIsDown(false)}
           />
         </Box>
         <Fab
