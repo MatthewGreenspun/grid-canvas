@@ -6,6 +6,10 @@ import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
+import Snackbar from "@material-ui/core/Snackbar";
+import Alert from "@material-ui/lab/Alert";
+import CloseIcon from "@material-ui/icons/Close";
+import IconButton from "@material-ui/core/IconButton";
 import Box from "@material-ui/core/Box";
 import CanvasSettings from "./CanvasSettings";
 
@@ -27,6 +31,7 @@ function Canvas() {
   const [mouseIsDown, setMouseIsDown] = useState(false);
   const [border, setBorder] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [warningShowed, setWarningShowed] = useState(false);
 
   const scaleCanvas = useCallback((canvas: HTMLCanvasElement) => {
     let dpi = window.devicePixelRatio;
@@ -205,6 +210,32 @@ function Canvas() {
             </Button>
           </DialogContent>
         </Dialog>
+      )}
+      {border && dimensions > 40 && (
+        <Snackbar
+          open={!warningShowed}
+          anchorOrigin={{
+            horizontal: "left",
+            vertical: "bottom",
+          }}
+          autoHideDuration={6000}
+        >
+          <>
+            <Alert
+              severity="warning"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "0 0 0 12px",
+              }}
+            >
+              Hiding the grid may improve performance
+              <IconButton onClick={() => setWarningShowed(true)}>
+                <CloseIcon color="secondary" />
+              </IconButton>
+            </Alert>
+          </>
+        </Snackbar>
       )}
     </Box>
   );
